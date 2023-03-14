@@ -21,16 +21,23 @@ class DocumentAttachmentsDownloader(
         }
     }
 
-    fun downloadDocumentFile(doc: Document, messageSender: DefaultAbsSender) {
+    fun downloadDocumentFile(
+        chatId: Long,
+        doc: Document,
+        messageSender: MessageSender,
+        fileDownloader: DefaultAbsSender
+    ) {
 
         val fileId: String = doc.fileId
         try {
-            FileReader(downloadFileWithId(messageSender, fileId)).use { reader ->
+            FileReader(downloadFileWithId(fileDownloader, fileId)).use { reader ->
                 println("Downloaded: ${doc.fileName}, file size: ${doc.fileSize} bytes")
                 val targetFile = File(outputDir, doc.fileName)
                 val outputStream = FileOutputStream(targetFile)
 
                 readToDestanationFile(outputStream, reader)
+
+                messageSender.sendMessage(chatId, "Downloaded ok")
             }
         } catch (e: Exception) {
             e.printStackTrace()

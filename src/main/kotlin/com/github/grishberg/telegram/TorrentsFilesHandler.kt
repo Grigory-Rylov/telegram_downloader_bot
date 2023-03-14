@@ -28,7 +28,7 @@ class TorrentsFilesHandler(
                 return
             }
 
-            torrentFileProcessor.downloadDocumentFile(doc, this)
+            torrentFileProcessor.downloadDocumentFile(update.message.chatId, doc, this, this)
             return
         }
 
