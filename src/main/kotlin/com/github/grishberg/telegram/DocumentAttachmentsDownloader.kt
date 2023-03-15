@@ -35,7 +35,7 @@ class DocumentAttachmentsDownloader(
                 val targetFile = File(outputDir, doc.fileName)
                 val outputStream = FileOutputStream(targetFile)
 
-                readToDestanationFile(outputStream, reader)
+                readToFile(targetFile, outputStream, reader)
 
                 messageSender.sendMessage(chatId, "Downloaded ok")
             }
@@ -44,7 +44,8 @@ class DocumentAttachmentsDownloader(
         }
     }
 
-    private fun readToDestanationFile(
+    private fun readToFile(
+        file: File,
         outputStream: FileOutputStream,
         reader: FileReader,
     ) {
@@ -54,6 +55,9 @@ class DocumentAttachmentsDownloader(
                 outputStream.write(byteRead)
             }
         }
+        file.setReadable(true, false)
+        file.setExecutable(true, false)
+        file.setWritable(true, false)
     }
 
     @Throws(TelegramApiException::class)
