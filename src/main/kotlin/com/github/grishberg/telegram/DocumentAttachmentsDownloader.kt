@@ -5,8 +5,8 @@ import org.telegram.telegrambots.meta.api.methods.GetFile
 import org.telegram.telegrambots.meta.api.objects.Document
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException
 import java.io.File
-import java.io.FileOutputStream
-import java.io.FileReader
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 /**
  * Process document attachment.
@@ -30,34 +30,23 @@ class DocumentAttachmentsDownloader(
 
         val fileId: String = doc.fileId
         try {
-            FileReader(downloadFileWithId(fileDownloader, fileId)).use { reader ->
-                println("Downloaded: ${doc.fileName}, file size: ${doc.fileSize} bytes")
-                val targetFile = File(outputDir, doc.fileName)
-                val outputStream = FileOutputStream(targetFile)
+            val downloadFileWithId = downloadFileWithId(fileDownloader, fileId)
+            println("Downloaded: ${doc.fileName}, file size: ${doc.fileSize} bytes")
 
-                readToFile(targetFile, outputStream, reader)
+            val targetFile = File(outputDir, doc.fileName)
+            Files.copy(
+                downloadFileWithId.toPath(), targetFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING
+            )
 
-                messageSender.sendMessage(chatId, "Downloaded ok")
-            }
+            targetFile.setReadable(true, false)
+            targetFile.setWritable(true, false)
+
+            messageSender.sendMessage(chatId, "Downloaded ok")
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    private fun readToFile(
-        file: File,
-        outputStream: FileOutputStream,
-        reader: FileReader,
-    ) {
-        var byteRead: Int
-        outputStream.use { outputStream ->
-            while (reader.read().also { byteRead = it } != -1) {
-                outputStream.write(byteRead)
-            }
-        }
-        file.setReadable(true, false)
-        file.setExecutable(true, false)
-        file.setWritable(true, false)
     }
 
     @Throws(TelegramApiException::class)
