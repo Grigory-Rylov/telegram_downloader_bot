@@ -21,7 +21,7 @@ class TorrentsFilesHandler(
 
         if (update.message.hasDocument()) {
             val doc = update.message.document
-            if (doc.mimeType != TORRENT_MIME_TYPE) {
+            if (doc.mimeType != null && doc.mimeType != TORRENT_MIME_TYPE) {
                 sendMessage(update.message.chatId, "Unsupported file type : ${doc.mimeType}")
                 return
             }
