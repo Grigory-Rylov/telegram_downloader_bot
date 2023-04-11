@@ -11,9 +11,7 @@ class TorrentsFilesHandler(
     private val botUserName: String,
     private val torrentFileProcessor: DocumentAttachmentsDownloader,
 ) : TelegramLongPollingBot(botToken), MessageSender {
-
     override fun getBotUsername(): String = botUserName
-
     override fun onUpdateReceived(update: Update) {
         if (!update.hasMessage()) {
             println(update)
@@ -24,7 +22,7 @@ class TorrentsFilesHandler(
         if (update.message.hasDocument()) {
             val doc = update.message.document
             if (doc.mimeType != TORRENT_MIME_TYPE) {
-                sendMessage(update.message.chatId, "Unsupported file type")
+                sendMessage(update.message.chatId, "Unsupported file type : ${doc.mimeType}")
                 return
             }
 
